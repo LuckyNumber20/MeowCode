@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeowCode</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #0f1117;
+  --surface:   #161926;
+  --surface2:  #1e2235;
+  --border:    #2a2e45;
+  --primary:   #6c63ff;
+  --primary-d: #5549e8;
+  --success:   #43e97b;
+  --danger:    #ff6b6b;
+  --warn:      #ffd93d;
+  --text:      #e8eaf0;
+  --muted:     #6b7280;
+  --muted2:    #9ca3af;
+  --py:  #3b82f6; --py-bg:  #1e3a5f30;
+  --tu:  #22c55e; --tu-bg:  #14532d30;
+  --ht:  #f97316; --ht-bg:  #7c2d1230;
+  --js:  #eab308; --js-bg:  #71350030;
+}
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+.hidden { display: none !important; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Auth Screen ─────────────────────────────────────────────────────── */
+#view-auth {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 20% 50%, #1a1540 0%, var(--bg) 60%);
+}
+.auth-wrap { width: 420px; }
+.auth-logo {
+  font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700;
+  color: var(--text); margin-bottom: 4px; letter-spacing: -0.5px;
+}
+.auth-logo span { color: var(--primary); }
+.auth-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+.auth-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px;
+}
+.auth-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--muted2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.field input, .field select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 0.88rem;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--primary); }
+.role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.role-opt {
+  border: 2px solid var(--border); border-radius: 8px; padding: 10px; text-align: center;
+  cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all 0.15s; color: var(--muted2);
+}
+.role-opt:hover { border-color: var(--primary); color: var(--text); }
+.role-opt.selected { border-color: var(--primary); background: #6c63ff18; color: var(--primary); }
+.role-opt .emoji { font-size: 1.3rem; display: block; margin-bottom: 4px; }
+.btn-primary {
+  width: 100%; padding: 10px; background: var(--primary); color: white; border: none;
+  border-radius: 8px; font-size: 0.88rem; font-weight: 600; transition: background 0.15s;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.btn-primary:hover { background: var(--primary-d); }
+.btn-ghost {
+  width: 100%; padding: 9px; background: transparent; color: var(--muted2);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+  margin-top: 8px; transition: all 0.15s;
+}
+.btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+.auth-switch { text-align: center; margin-top: 16px; font-size: 0.82rem; color: var(--muted); }
+.err-msg { color: var(--danger); font-size: 0.78rem; margin-top: 10px; min-height: 18px; }
+
+/* ── Pending Screen ───────────────────────────────────────────────────── */
+#view-pending {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 80% 50%, #1a1540 0%, var(--bg) 60%);
+}
+.pending-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 40px 36px; text-align: center; max-width: 400px;
+}
+.pending-icon { font-size: 3rem; margin-bottom: 16px; }
+.pending-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; margin-bottom: 10px; }
+.pending-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 24px; }
+.code-pill {
+  display: inline-block; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 20px; font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem; font-weight: 700; color: var(--primary); letter-spacing: 4px; margin-bottom: 20px;
+}
+.btn-sm-ghost {
+  background: transparent; border: 1px solid var(--border); color: var(--muted2);
+  border-radius: 6px; padding: 7px 16px; font-size: 0.8rem; transition: all 0.15s;
+}
+.btn-sm-ghost:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── App Shell ────────────────────────────────────────────────────────── */
+#view-app { display: flex; height: 100vh; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+#sidebar {
+  width: 230px; min-width: 230px; background: var(--surface);
+  border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden;
+}
+.sb-logo {
+  padding: 20px; font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem;
+  font-weight: 700; color: var(--text); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.sb-logo span { color: var(--primary); }
+.sb-user {
+  padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer;
+  transition: background 0.15s; flex-shrink: 0; position: relative;
+}
+.sb-user:hover { background: var(--surface2); }
+.sb-user-row { display: flex; align-items: center; gap: 10px; }
+.sb-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--primary);
+  display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+  font-weight: 700; color: white; flex-shrink: 0;
+}
+.sb-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.sb-role { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+.role-tag {
+  font-size: 0.58rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-left: 4px;
+}
+.role-tag.teacher { background: var(--warn); color: #1a1000; }
+.role-tag.student { background: var(--primary); color: white; }
+.sb-class-label { font-size: 0.72rem; color: var(--muted); margin-top: 6px; padding: 6px 10px; background: var(--surface2); border-radius: 6px; }
+.sb-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+.sb-section-label {
+  padding: 10px 16px 4px; font-size: 0.65rem; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+  color: var(--muted2); font-size: 0.84rem; font-weight: 500; cursor: pointer;
+  transition: all 0.15s; border-left: 3px solid transparent; margin: 1px 0;
+}
+.sb-item:hover { background: var(--surface2); color: var(--text); }
+.sb-item.active { background: #6c63ff18; color: var(--primary); border-left-color: var(--primary); }
+.sb-item .icon { width: 18px; text-align: center; font-size: 0.9rem; }
+.sb-footer { padding: 10px 0; border-top: 1px solid var(--border); flex-shrink: 0; }
+.sb-new-btn {
+  display: flex; align-items: center; gap: 10px; margin: 4px 10px;
+  padding: 9px 14px; background: var(--primary); color: white; border: none;
+  border-radius: 8px; font-size: 0.84rem; font-weight: 600; width: calc(100% - 20px);
+  font-family: 'Space Grotesk', sans-serif; transition: background 0.15s;
+}
+.sb-new-btn:hover { background: var(--primary-d); }
+
+/* ── Page Content ─────────────────────────────────────────────────────── */
+#page-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); }
+
+/* ── Content Views (Home & Classroom) ────────────────────────────────── */
+.view-page { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.page-header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 24px 28px 20px; flex-shrink: 0;
+}
+.page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; }
+.page-header p { color: var(--muted); font-size: 0.83rem; margin-top: 4px; }
+.page-body { padding: 24px 28px; }
+
+/* ── Class Info Banner ────────────────────────────────────────────────── */
+.class-banner {
+  background: linear-gradient(135deg, #1a1540 0%, #1e2235 100%);
+  border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px;
+  margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between;
+}
+.class-banner-left h3 { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.class-banner-code { font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700; color: var(--primary); letter-spacing: 5px; }
+.class-banner-info { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+
+/* ── Section Headers ──────────────────────────────────────────────────── */
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sec-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--text); }
+
+/* ── Project Grid & Cards ─────────────────────────────────────────────── */
+.proj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.proj-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 0; overflow: hidden; transition: all 0.2s; position: relative;
+}
+.proj-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108,99,255,0.12); }
+.proj-card-lang-bar { height: 3px; width: 100%; }
+.lang-py  .proj-card-lang-bar { background: var(--py); }
+.lang-tu  .proj-card-lang-bar { background: var(--tu); }
+.lang-ht  .proj-card-lang-bar { background: var(--ht); }
+.lang-js  .proj-card-lang-bar { background: var(--js); }
+.proj-card-body { padding: 14px; }
+.proj-card-title { font-size: 0.88rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+.proj-card-meta { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.lang-chip {
+  font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.lang-chip.py  { background: var(--py-bg); color: var(--py); }
+.lang-chip.tu  { background: var(--tu-bg); color: var(--tu); }
+.lang-chip.ht  { background: var(--ht-bg); color: var(--ht); }
+.lang-chip.js  { background: var(--js-bg); color: var(--js); }
+.proj-card-actions { padding: 10px 14px 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+.act-btn {
+  font-size: 0.72rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--muted2); font-weight: 500; transition: all 0.15s;
+}
+.act-btn:hover { border-color: var(--primary); color: var(--primary); }
+.act-btn.play { background: var(--primary); color: white; border-color: var(--primary); }
+.act-btn.play:hover { background: var(--primary-d); }
+.act-btn.del:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── Empty State ────────────────────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+.empty-state .e-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.85rem; }
+
+/* ── Manage Class ────────────────────────────────────────────────────── */
+.list-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+}
+.list-item-name { font-size: 0.86rem; font-weight: 600; }
+.list-item-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.list-item-actions { display: flex; gap: 6px; }
+.btn-accept { background: #16532d; color: var(--success); border: 1px solid var(--success); border-radius: 6px; padding: 4px 12px; font-size: 0.76rem; font-weight: 600; transition: all 0.15s; }
+.btn-accept:hover { background: var(--success); color: #0a1a0a; }
+.btn-reject { background: #3f1414; color: var(--danger); border: 1px solid var(--danger); border-radius: 6px; padding: 4px 12px; font-size: 0.76rem; font-weight: 600; transition: all 0.15s; }
+.btn-reject:hover { background: var(--danger); color: white; }
+.btn-kick { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; font-size: 0.76rem; transition: all 0.15s; }
+.btn-kick:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── Editor View ─────────────────────────────────────────────────────── */
+#view-editor { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #1e1e2e; }
+.ed-topbar {
+  background: #13131f; border-bottom: 1px solid #2a2a3e; padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-height: 50px;
+}
+.ed-back {
+  background: transparent; border: 1px solid #3a3a5c; color: var(--muted2);
+  border-radius: 6px; padding: 5px 10px; font-size: 0.76rem; transition: all 0.15s;
+}
+.ed-back:hover { border-color: var(--primary); color: var(--primary); }
+.ed-title {
+  background: transparent; border: 1px solid transparent; color: var(--text);
+  font-size: 0.9rem; font-weight: 600; padding: 5px 8px; border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif; min-width: 140px;
+}
+.ed-title:focus { outline: none; border-color: var(--primary); background: #13131f; }
+.lang-tabs { display: flex; gap: 2px; background: #13131f; border: 1px solid #2a2a3e; border-radius: 7px; padding: 3px; }
+.lang-tab {
+  padding: 4px 11px; border-radius: 5px; font-size: 0.74rem; font-weight: 600;
+  cursor: pointer; color: var(--muted); transition: all 0.15s; border: none; background: transparent;
+}
+.lang-tab:hover { color: var(--text); }
+.lang-tab.active-py  { background: var(--py-bg);  color: var(--py); }
+.lang-tab.active-tu  { background: var(--tu-bg);  color: var(--tu); }
+.lang-tab.active-ht  { background: var(--ht-bg);  color: var(--ht); }
+.lang-tab.active-js  { background: var(--js-bg);  color: var(--js); }
+.syntax-badge {
+  font-size: 0.7rem; padding: 3px 9px; border-radius: 5px; font-weight: 600; white-space: nowrap;
+}
+.syn-ok    { background: #0e2e1a; color: var(--success); }
+.syn-err   { background: #2e0e0e; color: var(--danger); }
+.syn-check { background: #1e1e2e; color: var(--muted); }
+.ed-spacer { flex: 1; }
+.ed-status { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.ed-save-btn {
+  background: #0e2e1a; border: 1px solid var(--success); color: var(--success);
+  border-radius: 6px; padding: 5px 13px; font-size: 0.78rem; font-weight: 600; transition: all 0.15s;
+}
+.ed-save-btn:hover { background: var(--success); color: #0a1a0a; }
+.ed-run-btn {
+  background: var(--primary); border: none; color: white;
+  border-radius: 6px; padding: 5px 14px; font-size: 0.78rem; font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif; transition: background 0.15s;
+}
+.ed-run-btn:hover { background: var(--primary-d); }
+.ed-share-btn {
+  background: transparent; border: 1px solid #3a3a5c; color: var(--muted2);
+  border-radius: 6px; padding: 5px 11px; font-size: 0.76rem; transition: all 0.15s;
+}
+.ed-share-btn:hover { border-color: var(--primary); color: var(--primary); }
+.ed-workspace { flex: 1; overflow: hidden; display: flex; }
+.ed-code-pane { flex: 1; overflow: hidden; display: flex; flex-direction: column; border-right: 1px solid #2a2a3e; }
+.ed-code-pane .CodeMirror { height: 100%; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65; }
+.ed-code-pane .CodeMirror-scroll { height: 100%; }
+.ed-output-pane { width: 45%; display: flex; flex-direction: column; overflow: hidden; }
+.out-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: 1px solid #2a2a3e; }
+.out-label { background: #13131f; padding: 5px 12px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
+#preview-iframe { flex: 1; border: none; background: white; width: 100%; }
+#preview-turtle { flex: 1; background: white; width: 100%; }
+#preview-text { flex: 1; background: #0d1117; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 10px; overflow-y: auto; white-space: pre-wrap; }
+.console-pane { height: 140px; display: flex; flex-direction: column; flex-shrink: 0; }
+.console-top { background: #13131f; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.console-clear { cursor: pointer; opacity: 0.6; font-size: 0.6rem; background: none; border: none; color: var(--muted); padding: 0; }
+.console-clear:hover { opacity: 1; }
+#console-out { flex: 1; background: #0d1117; padding: 8px 10px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+.clog { line-height: 1.5; }
+.clog.out   { color: #c9d1d9; }
+.clog.err   { color: var(--danger); }
+.clog.warn  { color: var(--warn); }
+.clog.info  { color: var(--py); }
+
+/* ── Modals ──────────────────────────────────────────────────────────── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 26px; min-width: 380px; max-width: 92vw; box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.modal-box h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.modal-field input, .modal-field select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; padding: 8px 11px; color: var(--text); font-size: 0.85rem;
+}
+.modal-field input:focus, .modal-field select:focus { outline: none; border-color: var(--primary); }
+.modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+.modal-btn-primary {
+  flex: 1; padding: 9px; background: var(--primary); color: white; border: none;
+  border-radius: 7px; font-size: 0.85rem; font-weight: 600; font-family: 'Space Grotesk', sans-serif;
+  transition: background 0.15s;
+}
+.modal-btn-primary:hover { background: var(--primary-d); }
+.modal-btn-cancel {
+  flex: 1; padding: 9px; background: transparent; color: var(--muted2);
+  border: 1px solid var(--border); border-radius: 7px; font-size: 0.85rem; font-weight: 500;
+  transition: all 0.15s;
+}
+.modal-btn-cancel:hover { border-color: var(--primary); color: var(--primary); }
+.lang-radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lang-radio-opt {
+  border: 2px solid var(--border); border-radius: 8px; padding: 10px 12px;
+  cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px;
+  font-size: 0.82rem; font-weight: 500; color: var(--muted2);
+}
+.lang-radio-opt:hover { border-color: var(--primary); color: var(--text); }
+.lang-radio-opt.sel-py { border-color: var(--py); background: var(--py-bg); color: var(--py); }
+.lang-radio-opt.sel-tu { border-color: var(--tu); background: var(--tu-bg); color: var(--tu); }
+.lang-radio-opt.sel-ht { border-color: var(--ht); background: var(--ht-bg); color: var(--ht); }
+.lang-radio-opt.sel-js { border-color: var(--js); background: var(--js-bg); color: var(--js); }
+
+/* ── Play Modal ──────────────────────────────────────────────────────── */
+.play-modal-box {
+  background: #13131f; border: 1px solid #2a2a3e; border-radius: 14px;
+  overflow: hidden; width: 700px; max-width: 94vw; max-height: 88vh;
+  display: flex; flex-direction: column;
+}
+.play-modal-top { background: #0d0d1a; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.play-modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; }
+.play-modal-close { background: none; border: none; color: var(--muted); font-size: 1.1rem; line-height: 1; }
+.play-modal-close:hover { color: var(--text); }
+.play-out-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.play-preview { flex: 1; overflow: hidden; position: relative; }
+#play-iframe { width: 100%; height: 100%; border: none; }
+#play-turtle { width: 100%; height: 100%; background: white; }
+#play-text { width: 100%; height: 100%; background: #0d1117; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 10px; overflow-y: auto; white-space: pre-wrap; }
+.play-console { height: 120px; flex-shrink: 0; display: flex; flex-direction: column; border-top: 1px solid #2a2a3e; }
+.play-console-label { background: #0d0d1a; padding: 4px 12px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+#play-console-out { flex: 1; background: #0d1117; padding: 6px 10px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+/* ── Permissions Modal ───────────────────────────────────────────────── */
+.perm-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px; background: var(--surface2); border-radius: 6px; margin-bottom: 6px;
+}
+.perm-row-name { font-size: 0.82rem; font-weight: 600; }
+.perm-row-badge {
+  font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+  text-transform: uppercase;
+}
+.perm-view { background: #1e3a5f40; color: var(--py); }
+.perm-edit { background: #1a2f1a40; color: var(--success); }
+.perm-del-btn { background: none; border: none; color: var(--muted); font-size: 0.85rem; }
+.perm-del-btn:hover { color: var(--danger); }
+.info-box {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 7px;
+  padding: 10px 12px; font-size: 0.78rem; color: var(--muted); margin-bottom: 14px;
+}
+.info-box code { color: var(--primary); font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; cursor: pointer; }
+.perm-add-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.perm-add-row input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 10px; color: var(--text); font-size: 0.82rem; }
+.perm-add-row input:focus { outline: none; border-color: var(--primary); }
+.perm-add-row select { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 10px; color: var(--text); font-size: 0.82rem; }
+.perm-add-btn { background: var(--primary); border: none; color: white; border-radius: 7px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600; }
+.perm-add-btn:hover { background: var(--primary-d); }
+
+/* ── Profile Dropdown ─────────────────────────────────────────────────── */
+#profile-drop {
+  position: fixed; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; min-width: 200px; z-index: 800;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+}
+.dd-head { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.dd-head-name { font-size: 0.86rem; font-weight: 700; }
+.dd-head-email { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+.dd-item { padding: 10px 14px; font-size: 0.83rem; cursor: pointer; transition: background 0.12s; }
+.dd-item:hover { background: var(--surface2); }
+.dd-item.logout { color: var(--danger); }
+.dd-item.logout:hover { background: #3f141430; }
+</style>
+</head>
+<body>
+
+<!-- ═══════ AUTH ═══════ -->
+<div id="view-auth">
+  <div class="auth-wrap">
+    <div class="auth-logo">Meow<span>Code</span></div>
+    <div class="auth-sub">The classroom coding sandbox</div>
+    <div class="auth-card" id="auth-login-card">
+      <h2>Sign in</h2>
+      <div class="field"><label>Email</label><input type="email" id="l-email" placeholder="you@school.edu"></div>
+      <div class="field"><label>Password</label><input type="password" id="l-pass" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="auth-switch">No account? <a href="#" onclick="swapAuth('reg')">Register</a></div>
+      <div class="err-msg" id="l-err"></div>
+    </div>
+    <div class="auth-card hidden" id="auth-reg-card">
+      <h2>Create account</h2>
+      <div class="field"><label>Full Name</label><input type="text" id="r-name" placeholder="Alex Johnson"></div>
+      <div class="field"><label>Email</label><input type="email" id="r-email" placeholder="you@school.edu"></div>
+      <div class="field"><label>Password</label><input type="password" id="r-pass"></div>
+      <div class="field">
+        <label>I am a...</label>
+        <div class="role-picker">
+          <div class="role-opt selected" id="role-student" onclick="selectRole('student')"><span class="emoji">🎒</span>Student</div>
+          <div class="role-opt" id="role-teacher" onclick="selectRole('teacher')"><span class="emoji">🏫</span>Teacher</div>
+        </div>
+      </div>
+      <div class="field" id="class-code-field"><label>Teacher's Class Code</label><input type="text" id="r-code" placeholder="e.g. ABC123" style="text-transform:uppercase"></div>
+      <button class="btn-primary" onclick="doRegister()">Create Account</button>
+      <button class="btn-ghost" onclick="swapAuth('login')">Back to Sign In</button>
+      <div class="err-msg" id="r-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PENDING ═══════ -->
+<div id="view-pending" class="hidden">
+  <div class="pending-card">
+    <div class="pending-icon">⏳</div>
+    <h2>Awaiting Approval</h2>
+    <p>Your join request has been sent. Please wait for your teacher to approve your account.</p>
+    <div class="code-pill" id="pending-code">———</div>
+    <br>
+    <button class="btn-sm-ghost" onclick="doLogout()">Log Out</button>
+  </div>
+</div>
+
+<!-- ═══════ APP SHELL ═══════ -->
+<div id="view-app" class="hidden">
+
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="sb-logo">Meow<span>Code</span></div>
+    <div class="sb-user" onclick="toggleDrop(event)" id="sb-user-btn">
+      <div class="sb-user-row">
+        <div class="sb-avatar" id="sb-avatar">?</div>
+        <div>
+          <div class="sb-name" id="sb-name">—</div>
+          <div class="sb-role" id="sb-role-line">—</div>
+        </div>
+      </div>
+      <div class="sb-class-label" id="sb-class-label"></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section-label">Menu</div>
+      <div class="sb-item active" id="nav-home" onclick="navTo('home')"><span class="icon">🏠</span> Home</div>
+      <div class="sb-item" id="nav-classroom" onclick="navTo('classroom')"><span class="icon">📚</span> Classroom</div>
+      <div class="sb-item hidden" id="nav-manage" onclick="navTo('manage')"><span class="icon">👥</span> Manage Class</div>
+    </div>
+    <div class="sb-footer">
+      <button class="sb-new-btn" onclick="openNewProjModal()"><span>＋</span> New Project</button>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div id="page-content">
+
+    <!-- HOME -->
+    <div class="view-page" id="view-home">
+      <div class="page-header">
+        <h1 id="home-title">Welcome!</h1>
+        <p id="home-sub"></p>
+      </div>
+      <div class="page-body">
+        <div class="class-banner" id="home-banner"></div>
+        <div class="sec-header"><div class="sec-title">📁 Recent Projects</div></div>
+        <div id="home-recents"><div class="empty-state"><div class="e-icon">📝</div><p>No projects yet — hit <b>New Project</b> to start!</p></div></div>
+      </div>
+    </div>
+
+    <!-- CLASSROOM -->
+    <div class="view-page hidden" id="view-classroom">
+      <div class="page-header">
+        <h1>📚 Classroom Projects</h1>
+        <p id="cl-sub"></p>
+      </div>
+      <div class="page-body">
+        <div id="cl-grid" class="proj-grid"><div class="empty-state" style="grid-column:1/-1"><div class="e-icon">📂</div><p>No projects yet.</p></div></div>
+      </div>
+    </div>
+
+    <!-- MANAGE CLASS (teacher) -->
+    <div class="view-page hidden" id="view-manage">
+      <div class="page-header">
+        <h1>👥 Manage Classroom</h1>
+        <p>Approve students and manage your class roster.</p>
+      </div>
+      <div class="page-body">
+        <div class="sec-header" style="margin-bottom:10px"><div class="sec-title">⏳ Pending Requests</div></div>
+        <div id="manage-pending" style="margin-bottom:28px"><p style="color:var(--muted);font-size:0.85rem">No pending requests.</p></div>
+        <div class="sec-header" style="margin-bottom:10px"><div class="sec-title">🎒 Class Members</div></div>
+        <div id="manage-members"><p style="color:var(--muted);font-size:0.85rem">No members yet.</p></div>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="hidden" id="view-editor">
+      <div class="ed-topbar">
+        <button class="ed-back" onclick="navTo('home')">← Back</button>
+        <input class="ed-title" id="ed-title" placeholder="Untitled" oninput="markUnsaved()">
+        <div class="lang-tabs" id="lang-tabs">
+          <button class="lang-tab" data-lang="python" onclick="setLang('python')">🐍 Python</button>
+          <button class="lang-tab" data-lang="turtle" onclick="setLang('turtle')">🐢 Turtle</button>
+          <button class="lang-tab" data-lang="html"   onclick="setLang('html')">🌐 HTML</button>
+          <button class="lang-tab" data-lang="javascript" onclick="setLang('javascript')">⚡ JS</button>
+        </div>
+        <span class="syntax-badge syn-check" id="syn-badge">···</span>
+        <div class="ed-spacer"></div>
+        <span class="ed-status" id="ed-status"></span>
+        <button class="ed-save-btn" onclick="saveProject()">💾 Save</button>
+        <button class="ed-run-btn"  onclick="runCode()">▶ Run</button>
+        <button class="ed-share-btn" id="btn-share" onclick="openPermModal()">🔐 Share</button>
+      </div>
+      <div class="ed-workspace">
+        <div class="ed-code-pane"><textarea id="code-ta"></textarea></div>
+        <div class="ed-output-pane">
+          <div class="out-section">
+            <div class="out-label">Preview / Output</div>
+            <iframe id="preview-iframe" sandbox="allow-scripts allow-modals"></iframe>
+            <canvas id="preview-turtle" class="hidden"></canvas>
+            <div id="preview-text" class="hidden"></div>
+          </div>
+          <div class="console-pane">
+            <div class="console-top">
+              <span>Console</span>
+              <button class="console-clear" onclick="clearConsole()">✕ clear</button>
+            </div>
+            <div id="console-out"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /view-app -->
+
+<!-- ═══════ PROFILE DROPDOWN ═══════ -->
+<div id="profile-drop" class="hidden">
+  <div class="dd-head"><div class="dd-head-name" id="dd-name">—</div><div class="dd-head-email" id="dd-email">—</div></div>
+  <div class="dd-item logout" onclick="doLogout()">🚪 Log Out</div>
+</div>
+
+<!-- ═══════ MODAL: New Project ═══════ -->
+<div class="modal-bg hidden" id="modal-new">
+  <div class="modal-box">
+    <h3>New Project</h3>
+    <div class="modal-field"><label>Project Name</label><input type="text" id="np-title" placeholder="My Cool Project"></div>
+    <div class="modal-field">
+      <label>Language</label>
+      <div class="lang-radio-grid" id="lang-radio-grid">
+        <div class="lang-radio-opt sel-py" data-val="python"     onclick="selectNewLang('python')">🐍 Python</div>
+        <div class="lang-radio-opt"        data-val="turtle"     onclick="selectNewLang('turtle')">🐢 Turtle</div>
+        <div class="lang-radio-opt"        data-val="html"       onclick="selectNewLang('html')">🌐 HTML</div>
+        <div class="lang-radio-opt"        data-val="javascript" onclick="selectNewLang('javascript')">⚡ JavaScript</div>
+      </div>
+    </div>
+    <div class="err-msg" id="np-err"></div>
+    <div class="modal-btns">
+      <button class="modal-btn-primary" onclick="createProject()">Create</button>
+      <button class="modal-btn-cancel" onclick="closeModal('modal-new')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: Play ═══════ -->
+<div class="modal-bg hidden" id="modal-play">
+  <div class="play-modal-box">
+    <div class="play-modal-top">
+      <span class="play-modal-title" id="play-title">Project</span>
+      <button class="play-modal-close" onclick="closeModal('modal-play')">✕</button>
+    </div>
+    <div class="play-out-wrap">
+      <div class="play-preview">
+        <iframe id="play-iframe" sandbox="allow-scripts allow-modals" style="width:100%;height:100%;border:none;"></iframe>
+        <canvas id="play-turtle" class="hidden" style="width:100%;height:100%;background:white;"></canvas>
+        <div id="play-text" class="hidden" style="width:100%;height:100%;background:#0d1117;color:#c9d1d9;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;overflow-y:auto;white-space:pre-wrap;"></div>
+      </div>
+      <div class="play-console">
+        <div class="play-console-label">Console</div>
+        <div id="play-console-out"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: Permissions ═══════ -->
+<div class="modal-bg hidden" id="modal-perm">
+  <div class="modal-box" style="min-width:440px">
+    <h3>🔐 Share Project</h3>
+    <div class="info-box">Your User ID: <code id="my-uid" onclick="copyUID()">—</code> <small style="color:var(--muted)">(click to copy)</small></div>
+    <div class="perm-add-row">
+      <input type="text" id="perm-uid-input" placeholder="Paste a User ID">
+      <select id="perm-level"><option value="view">View</option><option value="edit">Edit</option></select>
+      <button class="perm-add-btn" onclick="addPerm()">Add</button>
+    </div>
+    <div id="perm-list" style="min-height:50px;margin-bottom:14px"></div>
+    <button class="modal-btn-cancel" style="width:100%" onclick="closeModal('modal-perm')">Done</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  APPWRITE CONFIG
+//  ─────────────────────────────────────────────────────────────────────
+//  1. Create a project at cloud.appwrite.io
+//  2. Enable Email/Password auth
+//  3. Create a database with these collections & string attributes:
+//
+//  profiles:            userId, name, role, classCode
+//  classrooms:          teacherId, teacherName, classCode, className
+//  join_requests:       studentId, studentName, classCode, status
+//  projects:            ownerId, ownerName, title, language, code(size:65535), classCode, lastModified
+//  project_permissions: projectId, userId, userName, permission
+//
+//  4. Add indexes: profiles→userId; classrooms→teacherId,classCode;
+//     join_requests→studentId,classCode,status; projects→ownerId,classCode;
+//     project_permissions→projectId,userId
+// ═══════════════════════════════════════════════════════════════════════
+const { Client, Account, Databases, ID, Query } = Appwrite;
+const client = new Client()
+  .setEndpoint('https://cloud.appwrite.io/v1') // ← your endpoint
+  .setProject('YOUR_PROJECT_ID');              // ← replace
+
+const account = new Account(client);
+const db      = new Databases(client);
+
+const DB        = 'YOUR_DATABASE_ID';   // ← replace
+const C_PROF    = 'profiles';
+const C_CLASS   = 'classrooms';
+const C_JREQ    = 'join_requests';
+const C_PROJ    = 'projects';
+const C_PERM    = 'project_permissions';
+
+// ─── State ────────────────────────────────────────────────────────────
+const S = { user:null, profile:null, classroom:null, project:null, editor:null, unsaved:false, synTimer:null, newLang:'python', _permProjId:null };
+
+// ─── Starter templates ────────────────────────────────────────────────
+const TPL = {
+  python:     '# Python Sandbox\nprint("Hello, World!")\n\nfor i in range(5):\n    print(f"Line {i+1}")\n',
+  turtle:     'import turtle\n\nt = turtle.Turtle()\nt.speed(6)\nt.color("royalblue")\n\nfor i in range(6):\n    t.forward(120)\n    t.right(60)\n\nturtle.done()\n',
+  html:       '<!DOCTYPE html>\n<html>\n<head>\n  <title>My Page</title>\n  <style>\n    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }\n    h1   { color: #6c63ff; }\n  </style>\n</head>\n<body>\n  <h1>Hello, World!</h1>\n  <p>Edit this page!</p>\n</body>\n</html>\n',
+  javascript: '// JavaScript Sandbox\nconsole.log("Hello, World!");\n\nconst msg = "MeowCode is cool!";\ndocument.body.style.fontFamily = "sans-serif";\ndocument.body.style.padding   = "20px";\ndocument.body.innerHTML = `<h1 style="color:#6c63ff">${msg}</h1>`;\n',
+};
+
+// ─── Init ─────────────────────────────────────────────────────────────
+window.onload = async () => {
+  try { S.user = await account.get(); await loadProfile(); }
+  catch(e) { show('auth'); }
+};
+
+async function loadProfile() {
+  const r = await db.listDocuments(DB, C_PROF, [Query.equal('userId', S.user.$id)]);
+  if (!r.documents.length) { await account.deleteSession('current'); show('auth'); return; }
+  S.profile = r.documents[0];
+  if (S.profile.role === 'teacher') {
+    await ensureClassroom(); bootApp();
+  } else {
+    // student — check join status
+    const jr = await db.listDocuments(DB, C_JREQ, [
+      Query.equal('studentId', S.user.$id),
+      Query.equal('classCode', S.profile.classCode)
+    ]);
+    if (!jr.documents.length || jr.documents[0].status !== 'accepted') {
+      document.getElementById('pending-code').textContent = S.profile.classCode || '—';
+      show('pending'); return;
+    }
+    await loadStudentClass(); bootApp();
+  }
+}
+
+async function ensureClassroom() {
+  const r = await db.listDocuments(DB, C_CLASS, [Query.equal('teacherId', S.user.$id)]);
+  if (r.documents.length) { S.classroom = r.documents[0]; return; }
+  const code = mkCode();
+  S.classroom = await db.createDocument(DB, C_CLASS, ID.unique(), {
+    teacherId: S.user.$id, teacherName: S.profile.name,
+    classCode: code, className: `${S.profile.name}'s Class`
+  });
+  await db.updateDocument(DB, C_PROF, S.profile.$id, { classCode: code });
+  S.profile.classCode = code;
+}
+
+async function loadStudentClass() {
+  const r = await db.listDocuments(DB, C_CLASS, [Query.equal('classCode', S.profile.classCode)]);
+  if (r.documents.length) S.classroom = r.documents[0];
+}
+
+function bootApp() {
+  const name = S.profile.name;
+  document.getElementById('sb-name').textContent   = name;
+  document.getElementById('sb-avatar').textContent = name[0].toUpperCase();
+  document.getElementById('sb-role-line').innerHTML =
+    `<span class="role-tag ${S.profile.role}">${S.profile.role}</span>`;
+  document.getElementById('sb-class-label').textContent = S.classroom
+    ? `${S.classroom.className} · ${S.classroom.classCode}` : '';
+  document.getElementById('dd-name').textContent  = name;
+  document.getElementById('dd-email').textContent = S.user.email;
+  document.getElementById('my-uid').textContent   = S.user.$id;
+  if (S.profile.role === 'teacher') document.getElementById('nav-manage').classList.remove('hidden');
+  show('app'); navTo('home');
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────
+function navTo(v) {
+  ['home','classroom','manage','editor'].forEach(n => {
+    const el = document.getElementById(`view-${n}`);
+    if (el) el.classList.add('hidden');
+  });
+  ['home','classroom','manage'].forEach(n => {
+    const nb = document.getElementById(`nav-${n}`);
+    if (nb) nb.classList.remove('active');
+  });
+  const target = document.getElementById(`view-${v}`);
+  if (target) target.classList.remove('hidden');
+  const navEl = document.getElementById(`nav-${v}`);
+  if (navEl) navEl.classList.add('active');
+  // Sidebar visibility
+  const sb = document.getElementById('sidebar');
+  if (v === 'editor') {
+    sb.style.display = 'none';
+    document.getElementById('page-content').style.overflow = 'hidden';
+  } else {
+    sb.style.display = '';
+    document.getElementById('page-content').style.overflow = '';
+  }
+  if (v === 'home')      loadHome();
+  if (v === 'classroom') loadClassroom();
+  if (v === 'manage')    loadManage();
+}
+
+// ─── Home ─────────────────────────────────────────────────────────────
+async function loadHome() {
+  const isT = S.profile.role === 'teacher';
+  document.getElementById('home-title').textContent = `Welcome back, ${S.profile.name}!`;
+  document.getElementById('home-sub').textContent   = isT
+    ? `You're teaching · ${S.classroom?.className || ''}`
+    : `You're in · ${S.classroom?.className || ''}`;
+  const banner = document.getElementById('home-banner');
+  if (isT) {
+    banner.innerHTML = `
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Your Class Code</div>
+        <div class="class-code-display" style="font-family:'JetBrains Mono',monospace;font-size:1.7rem;font-weight:700;color:var(--primary);letter-spacing:5px">${S.classroom?.classCode || '—'}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Share this with students to join your class.</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">Class</div>
+        <div style="font-size:.95rem;font-weight:700">${esc(S.classroom?.className||'')}</div>
+      </div>`;
+  } else {
+    banner.innerHTML = `
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Your Class</div>
+        <div style="font-size:1.1rem;font-weight:700">${esc(S.classroom?.className||'Unknown')}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px">Teacher: ${esc(S.classroom?.teacherName||'—')}</div>
+      </div>`;
+  }
+  try {
+    const r = await db.listDocuments(DB, C_PROJ, [
+      Query.equal('ownerId', S.user.$id), Query.orderDesc('lastModified'), Query.limit(6)
+    ]);
+    const el = document.getElementById('home-recents');
+    if (!r.documents.length) {
+      el.innerHTML = `<div class="empty-state"><div class="e-icon">📝</div><p>No projects yet — hit <b>New Project</b> to start!</p></div>`; return;
+    }
+    el.innerHTML = `<div class="proj-grid">${r.documents.map(p => projCard(p, {}, true)).join('')}</div>`;
+  } catch(e) { console.error(e); }
+}
+
+// ─── Classroom ────────────────────────────────────────────────────────
+async function loadClassroom() {
+  if (!S.classroom) return;
+  document.getElementById('cl-sub').textContent = `${S.classroom.className} · ${S.classroom.classCode}`;
+  try {
+    const [projRes, permRes] = await Promise.all([
+      db.listDocuments(DB, C_PROJ, [Query.equal('classCode', S.classroom.classCode), Query.orderDesc('lastModified'), Query.limit(50)]),
+      S.profile.role !== 'teacher'
+        ? db.listDocuments(DB, C_PERM, [Query.equal('userId', S.user.$id), Query.limit(100)])
+        : Promise.resolve({ documents: [] })
+    ]);
+    const myPerms = {};
+    permRes.documents.forEach(p => { myPerms[p.projectId] = p.permission; });
+    const grid = document.getElementById('cl-grid');
+    if (!projRes.documents.length) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="e-icon">📂</div><p>No projects shared yet.</p></div>`; return;
+    }
+    grid.innerHTML = projRes.documents.map(p => projCard(p, myPerms, false)).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ─── Project Card ─────────────────────────────────────────────────────
+function projCard(p, myPerms, ownView) {
+  const isOwner = p.ownerId === S.user.$id;
+  const isT     = S.profile.role === 'teacher';
+  const perm    = myPerms[p.$id];
+  const canCode = isOwner || isT || perm;
+  const chips   = { python:'py', turtle:'tu', html:'ht', javascript:'js' };
+  const labels  = { python:'Python', turtle:'Turtle', html:'HTML', javascript:'JavaScript' };
+  const c = chips[p.language] || 'py';
+  let acts = `<button class="act-btn play" onclick="playProj('${p.$id}')">▶ Play</button>`;
+  if (canCode) acts += `<button class="act-btn" onclick="openProj('${p.$id}')">${(isOwner||isT||perm==='edit')?'✏️ Edit':'👁 View'}</button>`;
+  if (isOwner || isT) acts += `<button class="act-btn del" onclick="delProj('${p.$id}')">🗑</button>`;
+  return `<div class="proj-card lang-${c}">
+    <div class="proj-card-lang-bar"></div>
+    <div class="proj-card-body">
+      <div class="proj-card-title" title="${esc(p.title)}">${esc(p.title)}</div>
+      <div class="proj-card-meta">
+        <span class="lang-chip ${c}">${labels[p.language]||p.language}</span>
+        ${!ownView ? `<span>${esc(p.ownerName)}</span>` : ''}
+        <span style="margin-left:auto">${ago(p.lastModified)}</span>
+      </div>
+    </div>
+    <div class="proj-card-actions">${acts}</div>
+  </div>`;
+}
+
+// ─── Manage Class ─────────────────────────────────────────────────────
+async function loadManage() {
+  if (S.profile.role !== 'teacher') return;
+  try {
+    const pending = await db.listDocuments(DB, C_JREQ, [
+      Query.equal('classCode', S.classroom.classCode), Query.equal('status','pending')
+    ]);
+    const pEl = document.getElementById('manage-pending');
+    pEl.innerHTML = pending.documents.length
+      ? pending.documents.map(r => `
+          <div class="list-item">
+            <div><div class="list-item-name">${esc(r.studentName)}</div><div class="list-item-sub">${r.studentId}</div></div>
+            <div class="list-item-actions">
+              <button class="btn-accept" onclick="handleReq('${r.$id}','accepted')">✓ Accept</button>
+              <button class="btn-reject" onclick="handleReq('${r.$id}','rejected')">✕ Reject</button>
+            </div>
+          </div>`).join('')
+      : `<p style="color:var(--muted);font-size:.85rem">No pending requests.</p>`;
+
+    const members = await db.listDocuments(DB, C_JREQ, [
+      Query.equal('classCode', S.classroom.classCode), Query.equal('status','accepted')
+    ]);
+    const mEl = document.getElementById('manage-members');
+    mEl.innerHTML = members.documents.length
+      ? members.documents.map(r => `
+          <div class="list-item">
+            <div><div class="list-item-name">${esc(r.studentName)}</div><div class="list-item-sub">${r.studentId}</div></div>
+            <button class="btn-kick" onclick="kickStudent('${r.$id}')">Kick</button>
+          </div>`).join('')
+      : `<p style="color:var(--muted);font-size:.85rem">No members yet.</p>`;
+  } catch(e) { console.error(e); }
+}
+
+async function handleReq(id, status) {
+  try { await db.updateDocument(DB, C_JREQ, id, { status }); loadManage(); }
+  catch(e) { alert(e.message); }
+}
+
+async function kickStudent(id) {
+  if (!confirm('Remove this student from your class?')) return;
+  try { await db.deleteDocument(DB, C_JREQ, id); loadManage(); }
+  catch(e) { alert(e.message); }
+}
+
+// ─── Projects ─────────────────────────────────────────────────────────
+let _newLang = 'python';
+function openNewProjModal() {
+  document.getElementById('np-title').value = '';
+  document.getElementById('np-err').textContent = '';
+  selectNewLang('python');
+  document.getElementById('modal-new').classList.remove('hidden');
+}
+function selectNewLang(lang) {
+  _newLang = lang;
+  const suf = { python:'py', turtle:'tu', html:'ht', javascript:'js' };
+  document.querySelectorAll('.lang-radio-opt').forEach(el => {
+    const v = el.dataset.val;
+    el.className = `lang-radio-opt${v===lang?' sel-'+suf[v]:''}`;
+  });
+}
+
+async function createProject() {
+  const title = document.getElementById('np-title').value.trim();
+  const errEl = document.getElementById('np-err');
+  if (!title)       { errEl.textContent = 'Enter a project name.'; return; }
+  if (!S.classroom) { errEl.textContent = 'You must be in a class.'; return; }
+  try {
+    const doc = await db.createDocument(DB, C_PROJ, ID.unique(), {
+      ownerId: S.user.$id, ownerName: S.profile.name,
+      title, language: _newLang, code: TPL[_newLang]||'',
+      classCode: S.classroom.classCode, lastModified: new Date().toISOString()
+    });
+    closeModal('modal-new');
+    openProj(doc.$id);
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; }
+}
+
+async function openProj(id) {
+  try {
+    const doc = await db.getDocument(DB, C_PROJ, id);
+    const isOwner = doc.ownerId === S.user.$id;
+    const isT     = S.profile.role === 'teacher';
+    let canEdit = isOwner || isT;
+    let canView = isOwner || isT;
+    if (!canView) {
+      const pr = await db.listDocuments(DB, C_PERM, [
+        Query.equal('projectId', id), Query.equal('userId', S.user.$id)
+      ]);
+      if (pr.documents.length) { canView = true; canEdit = pr.documents[0].permission === 'edit'; }
+    }
+    if (!canView) { playProj(id); return; }
+    S.project = doc; S.unsaved = false;
+    navTo('editor');
+    setTimeout(() => initEditor(doc, canEdit), 60);
+  } catch(e) { alert('Could not open: ' + e.message); }
+}
+
+function initEditor(doc, canEdit) {
+  document.getElementById('ed-title').value = doc.title;
+  document.getElementById('ed-status').textContent = '';
+  document.getElementById('btn-share').style.display = doc.ownerId === S.user.$id ? '' : 'none';
+  if (S.editor) { S.editor.toTextArea(); S.editor = null; }
+  S.editor = CodeMirror.fromTextArea(document.getElementById('code-ta'), {
+    mode: langMode(doc.language), theme: 'monokai',
+    lineNumbers: true, matchBrackets: true, autoCloseBrackets: true,
+    indentUnit: 4, tabSize: 4, lineWrapping: false, readOnly: !canEdit,
+  });
+  S.editor.setValue(doc.code || TPL[doc.language] || '');
+  S.editor.setSize('100%','100%');
+  S.editor.on('change', () => { markUnsaved(); scheduleSyn(); });
+  setLangUI(doc.language);
+  clearConsole();
+  scheduleSyn();
+}
+
+async function saveProject() {
+  if (!S.project || !S.editor) return;
+  const title = document.getElementById('ed-title').value.trim() || 'Untitled';
+  const st = document.getElementById('ed-status');
+  st.textContent = 'Saving…';
+  try {
+    await db.updateDocument(DB, C_PROJ, S.project.$id, {
+      title, code: S.editor.getValue(), lastModified: new Date().toISOString()
+    });
+    S.project.title = title; S.unsaved = false;
+    st.textContent = '✓ Saved'; setTimeout(()=>{ st.textContent=''; }, 2000);
+  } catch(e) { st.textContent = '✕ Failed'; }
+}
+
+async function delProj(id) {
+  if (!confirm('Delete this project? This cannot be undone.')) return;
+  try {
+    await db.deleteDocument(DB, C_PROJ, id);
+    if (S.project?.$id === id) navTo('home');
+    else { loadHome(); loadClassroom(); }
+  } catch(e) { alert(e.message); }
+}
+
+function markUnsaved() {
+  S.unsaved = true;
+  document.getElementById('ed-status').textContent = '● Unsaved';
+}
+
+// Ctrl+S to save
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key === 's') { e.preventDefault(); saveProject(); }
+});
+
+// ─── Lang UI ──────────────────────────────────────────────────────────
+function setLang(lang) {
+  if (!S.editor) return;
+  if (S.project) S.project.language = lang;
+  S.editor.setOption('mode', langMode(lang));
+  setLangUI(lang);
+  clearConsole();
+  scheduleSyn();
+}
+
+function setLangUI(lang) {
+  const suf = { python:'py', turtle:'tu', html:'ht', javascript:'js' };
+  document.querySelectorAll('.lang-tab').forEach(t => {
+    const tl = t.dataset.lang;
+    t.className = `lang-tab${tl===lang?' active-'+suf[tl]:''}`;
+  });
+  // Show correct preview pane
+  const isIframe = lang==='html'||lang==='javascript';
+  const isTurtle = lang==='turtle';
+  const isText   = lang==='python';
+  document.getElementById('preview-iframe').classList.toggle('hidden', !isIframe);
+  document.getElementById('preview-turtle').classList.toggle('hidden', !isTurtle);
+  document.getElementById('preview-text').classList.toggle('hidden', !isText);
+}
+
+// ─── Run ──────────────────────────────────────────────────────────────
+function runCode() {
+  if (!S.editor || !S.project) return;
+  clearConsole();
+  const lang = S.project.language || 'python';
+  execute(S.editor.getValue(), lang, 'editor');
+}
+
+async function playProj(id) {
+  try {
+    const doc = await db.getDocument(DB, C_PROJ, id);
+    document.getElementById('play-title').textContent = doc.title;
+    // Show right element in play modal
+    const isIframe = doc.language==='html'||doc.language==='javascript';
+    document.getElementById('play-iframe').classList.toggle('hidden', !isIframe);
+    document.getElementById('play-turtle').classList.toggle('hidden', doc.language!=='turtle');
+    document.getElementById('play-text').classList.toggle('hidden',   doc.language!=='python');
+    document.getElementById('play-iframe').srcdoc   = '';
+    document.getElementById('play-text').textContent = '';
+    document.getElementById('play-console-out').innerHTML = '';
+    document.getElementById('modal-play').classList.remove('hidden');
+    execute(doc.code, doc.language, 'play');
+  } catch(e) { alert('Could not load project: ' + e.message); }
+}
+
+function execute(code, lang, ctx) {
+  const isPlay = ctx === 'play';
+  const iframeEl = document.getElementById(isPlay ? 'play-iframe'  : 'preview-iframe');
+  const turtleEl = document.getElementById(isPlay ? 'play-turtle'  : 'preview-turtle');
+  const textEl   = document.getElementById(isPlay ? 'play-text'    : 'preview-text');
+  const conEl    = document.getElementById(isPlay ? 'play-console-out' : 'console-out');
+
+  function log(msg, cls='out') {
+    const d = document.createElement('div');
+    d.className = `clog ${cls}`; d.textContent = msg;
+    conEl.appendChild(d); conEl.scrollTop = conEl.scrollHeight;
+  }
+
+  if (lang === 'html') {
+    iframeEl.srcdoc = code;
+    log('[HTML rendered]', 'info');
+
+  } else if (lang === 'javascript') {
+    const wrap = `<!DOCTYPE html><html><head><script>
+      window.onerror=function(m,s,l){parent.postMessage({_cs:1,t:'err',d:m+' (line '+l+')'},'*');};
+      console.log   =function(...a){parent.postMessage({_cs:1,t:'log',d:a.map(String).join(' ')},'*');};
+      console.error =function(...a){parent.postMessage({_cs:1,t:'err',d:a.map(String).join(' ')},'*');};
+      console.warn  =function(...a){parent.postMessage({_cs:1,t:'warn',d:a.map(String).join(' ')},'*');};
+    <\/script><\/head><body><script>${code}<\/script><\/body><\/html>`;
+    iframeEl.srcdoc = wrap;
+
+  } else if (lang === 'python') {
+    textEl.textContent = '';
+    Sk.configure({
+      output: t => { textEl.textContent += t; if(t.trim()) log(t.replace(/\n$/,''), 'out'); },
+      read:   f => { if(!Sk.builtinFiles?.files[f]) throw `File not found: '${f}'`; return Sk.builtinFiles.files[f]; },
+      __future__: Sk.python3
+    });
+    Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, code, true))
+      .catch(e => log(e.toString(), 'err'));
+
+  } else if (lang === 'turtle') {
+    const w = turtleEl.offsetWidth  || 480;
+    const h = turtleEl.offsetHeight || 320;
+    turtleEl.width = w; turtleEl.height = h;
+    Sk.configure({
+      output: t => { if(t.trim()) log(t.replace(/\n$/,''), 'out'); },
+      read:   f => { if(!Sk.builtinFiles?.files[f]) throw `File not found: '${f}'`; return Sk.builtinFiles.files[f]; },
+      __future__: Sk.python3
+    });
+    Sk.TurtleGraphics = { target: turtleEl, width: w, height: h };
+    Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, code, true))
+      .catch(e => log(e.toString(), 'err'));
+  }
+}
+
+// Intercept JS sandbox messages
+window.addEventListener('message', e => {
+  if (!e.data?._cs) return;
+  const cls = e.data.t === 'err' ? 'err' : e.data.t === 'warn' ? 'warn' : 'out';
+  const prefix = e.data.t === 'err' ? 'ERROR: ' : e.data.t === 'warn' ? 'WARN: ' : '';
+  function logTo(id) {
+    const el = document.getElementById(id); if (!el) return;
+    const d = document.createElement('div');
+    d.className = `clog ${cls}`; d.textContent = prefix + e.data.d;
+    el.appendChild(d); el.scrollTop = el.scrollHeight;
+  }
+  logTo('console-out'); logTo('play-console-out');
+});
+
+function clearConsole() {
+  document.getElementById('console-out').innerHTML = '';
+  const pt = document.getElementById('preview-text');
+  if (pt) pt.textContent = '';
+  const pi = document.getElementById('preview-iframe');
+  if (pi) pi.srcdoc = '';
+}
+
+// ─── Syntax Checker ───────────────────────────────────────────────────
+function scheduleSyn() {
+  clearTimeout(S.synTimer);
+  setBadge('check','···');
+  S.synTimer = setTimeout(runSyn, 700);
+}
+function setBadge(state, msg) {
+  const b = document.getElementById('syn-badge'); if (!b) return;
+  b.className = `syntax-badge syn-${state}`; b.textContent = msg;
+}
+function runSyn() {
+  if (!S.editor || !S.project) return;
+  const code = S.editor.getValue();
+  const lang = S.project.language || 'python';
+  let err = null;
+  try {
+    if (lang === 'python' || lang === 'turtle') {
+      Sk.parse('<stdin>', code);
+    } else if (lang === 'javascript') {
+      new Function(code);
+    }
+    // HTML: DOMParser does best-effort, no meaningful errors for html5
+  } catch(e) {
+    err = e.toString().replace(/^(ParseError|SyntaxError):\s*/,'').split('\n')[0].slice(0,80);
+  }
+  err ? setBadge('err','⚠ ' + err) : setBadge('ok','✓ No errors');
+}
+
+// ─── Permissions ──────────────────────────────────────────────────────
+function openPermModal() {
+  if (!S.project) return;
+  S._permProjId = S.project.$id;
+  document.getElementById('perm-uid-input').value = '';
+  document.getElementById('modal-perm').classList.remove('hidden');
+  loadPerms();
+}
+async function loadPerms() {
+  try {
+    const r = await db.listDocuments(DB, C_PERM, [Query.equal('projectId', S._permProjId)]);
+    const el = document.getElementById('perm-list');
+    el.innerHTML = r.documents.length
+      ? r.documents.map(p => `
+          <div class="perm-row">
+            <div>
+              <div class="perm-row-name">${esc(p.userName||p.userId)}</div>
+              <div style="font-size:.7rem;color:var(--muted)">${p.userId}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="perm-row-badge perm-${p.permission}">${p.permission}</span>
+              <button class="perm-del-btn" onclick="removePerm('${p.$id}')">✕</button>
+            </div>
+          </div>`).join('')
+      : `<p style="color:var(--muted);font-size:.8rem">No permissions set.</p>`;
+  } catch(e) { console.error(e); }
+}
+async function addPerm() {
+  const uid = document.getElementById('perm-uid-input').value.trim();
+  const lvl = document.getElementById('perm-level').value;
+  if (!uid) return;
+  let uname = uid;
+  try {
+    const pr = await db.listDocuments(DB, C_PROF, [Query.equal('userId', uid)]);
+    if (pr.documents.length) uname = pr.documents[0].name;
+  } catch(e) {}
+  try {
+    await db.createDocument(DB, C_PERM, ID.unique(), {
+      projectId: S._permProjId, userId: uid, userName: uname, permission: lvl
+    });
+    document.getElementById('perm-uid-input').value = '';
+    loadPerms();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+async function removePerm(id) {
+  try { await db.deleteDocument(DB, C_PERM, id); loadPerms(); }
+  catch(e) { alert(e.message); }
+}
+function copyUID() {
+  navigator.clipboard?.writeText(S.user.$id);
+}
+
+// ─── Auth ─────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('l-email').value;
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('l-err');
+  err.textContent = '';
+  try {
+    await account.createEmailSession(email, pass);
+    S.user = await account.get(); await loadProfile();
+  } catch(e) { err.textContent = 'Login failed: ' + e.message; }
+}
+
+async function doRegister() {
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const role  = document.querySelector('.role-opt.selected')?.id === 'role-teacher' ? 'teacher' : 'student';
+  const code  = document.getElementById('r-code').value.trim().toUpperCase();
+  const err   = document.getElementById('r-err');
+  err.textContent = '';
+  if (!name||!email||!pass) { err.textContent = 'All fields are required.'; return; }
+  if (role==='student'&&!code) { err.textContent = 'Enter your teacher\'s class code.'; return; }
+  if (role==='student') {
+    try {
+      const cr = await db.listDocuments(DB, C_CLASS, [Query.equal('classCode', code)]);
+      if (!cr.documents.length) { err.textContent = 'Class code not found. Check with your teacher.'; return; }
+    } catch(e) { err.textContent = 'Could not verify code: ' + e.message; return; }
+  }
+  try {
+    await account.create(ID.unique(), email, pass, name);
+    await account.createEmailSession(email, pass);
+    S.user = await account.get();
+    S.profile = await db.createDocument(DB, C_PROF, ID.unique(), {
+      userId: S.user.$id, name, role, classCode: role==='student' ? code : ''
+    });
+    if (role === 'student') {
+      await db.createDocument(DB, C_JREQ, ID.unique(), {
+        studentId: S.user.$id, studentName: name, classCode: code, status: 'pending'
+      });
+      document.getElementById('pending-code').textContent = code;
+      show('pending');
+    } else {
+      await ensureClassroom(); bootApp();
+    }
+  } catch(e) { err.textContent = 'Registration failed: ' + e.message; }
+}
+
+async function doLogout() {
+  try { await account.deleteSession('current'); } catch(e) {}
+  location.reload();
+}
+
+// ─── UI Helpers ───────────────────────────────────────────────────────
+function show(v) {
+  ['auth','pending','app'].forEach(n => document.getElementById(`view-${n}`).classList.toggle('hidden', n!==v));
+}
+function swapAuth(mode) {
+  document.getElementById('auth-login-card').classList.toggle('hidden', mode!=='login');
+  document.getElementById('auth-reg-card').classList.toggle('hidden',  mode!=='reg');
+}
+function selectRole(r) {
+  document.getElementById('role-student').classList.toggle('selected', r==='student');
+  document.getElementById('role-teacher').classList.toggle('selected', r==='teacher');
+  document.getElementById('class-code-field').classList.toggle('hidden', r==='teacher');
+}
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function toggleDrop(e) {
+  const dd = document.getElementById('profile-drop');
+  const rect = document.getElementById('sb-user-btn').getBoundingClientRect();
+  dd.style.top  = rect.bottom + 4 + 'px';
+  dd.style.left = rect.left   + 'px';
+  dd.classList.toggle('hidden');
+  e.stopPropagation();
+}
+document.addEventListener('click', e => {
+  const dd = document.getElementById('profile-drop');
+  if (!dd.contains(e.target)) dd.classList.add('hidden');
+});
+['modal-new','modal-play','modal-perm'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => { if(e.target.id===id) closeModal(id); });
+});
+
+// ─── Utility ──────────────────────────────────────────────────────────
+function langMode(l) { return {python:'python',turtle:'python',html:'htmlmixed',javascript:'javascript'}[l]||'python'; }
+function mkCode() {
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function ago(iso) {
+  if (!iso) return '';
+  const m = Math.floor((Date.now()-new Date(iso))/60000);
+  if (m<1) return 'just now';
+  if (m<60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if (h<24) return h+'h ago';
+  return Math.floor(h/24)+'d ago';
+}
+</script>
+</body>
+</html>
