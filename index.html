@@ -449,8 +449,8 @@ a:hover { text-decoration: underline; }
       <div class="field">
         <label>I am a...</label>
         <div class="role-picker">
-          <div class="role-opt selected" id="role-student" onclick="selectRole('student')"><span class="emoji">🎒</span>Student</div>
-          <div class="role-opt" id="role-teacher" onclick="selectRole('teacher')"><span class="emoji">🏫</span>Teacher</div>
+          <div class="role-opt selected" id="role-student" onclick="selectRole('student')">Student</div>
+          <div class="role-opt" id="role-teacher" onclick="selectRole('teacher')">Teacher</div>
         </div>
       </div>
       <div class="field" id="class-code-field"><label>Teacher's Class Code</label><input type="text" id="r-code" placeholder="e.g. ABC123" style="text-transform:uppercase"></div>
@@ -491,9 +491,9 @@ a:hover { text-decoration: underline; }
     </div>
     <div class="sb-nav">
       <div class="sb-section-label">Menu</div>
-      <div class="sb-item active" id="nav-home" onclick="navTo('home')"><span class="icon">🏠</span> Home</div>
-      <div class="sb-item" id="nav-classroom" onclick="navTo('classroom')"><span class="icon">📚</span> Classroom</div>
-      <div class="sb-item hidden" id="nav-manage" onclick="navTo('manage')"><span class="icon">👥</span> Manage Class</div>
+      <div class="sb-item active" id="nav-home" onclick="navTo('home')"> Home</div>
+      <div class="sb-item" id="nav-classroom" onclick="navTo('classroom')"> Classroom</div>
+      <div class="sb-item hidden" id="nav-manage" onclick="navTo('manage')"> Manage Class</div>
     </div>
     <div class="sb-footer">
       <button class="sb-new-btn" onclick="openNewProjModal()"><span>＋</span> New Project</button>
@@ -511,7 +511,7 @@ a:hover { text-decoration: underline; }
       </div>
       <div class="page-body">
         <div class="class-banner" id="home-banner"></div>
-        <div class="sec-header"><div class="sec-title">📁 Recent Projects</div></div>
+        <div class="sec-header"><div class="sec-title">Recent Projects</div></div>
         <div id="home-recents"><div class="empty-state"><div class="e-icon">📝</div><p>No projects yet — hit <b>New Project</b> to start!</p></div></div>
       </div>
     </div>
@@ -519,24 +519,24 @@ a:hover { text-decoration: underline; }
     <!-- CLASSROOM -->
     <div class="view-page hidden" id="view-classroom">
       <div class="page-header">
-        <h1>📚 Classroom Projects</h1>
+        <h1>Classroom Projects</h1>
         <p id="cl-sub"></p>
       </div>
       <div class="page-body">
-        <div id="cl-grid" class="proj-grid"><div class="empty-state" style="grid-column:1/-1"><div class="e-icon">📂</div><p>No projects yet.</p></div></div>
+        <div id="cl-grid" class="proj-grid"><div class="empty-state" style="grid-column:1/-1"><p>No projects yet.</p></div></div>
       </div>
     </div>
 
     <!-- MANAGE CLASS (teacher) -->
     <div class="view-page hidden" id="view-manage">
       <div class="page-header">
-        <h1>👥 Manage Classroom</h1>
+        <h1>Manage Classroom</h1>
         <p>Approve students and manage your class roster.</p>
       </div>
       <div class="page-body">
-        <div class="sec-header" style="margin-bottom:10px"><div class="sec-title">⏳ Pending Requests</div></div>
+        <div class="sec-header" style="margin-bottom:10px"><div class="sec-title">Pending Requests</div></div>
         <div id="manage-pending" style="margin-bottom:28px"><p style="color:var(--muted);font-size:0.85rem">No pending requests.</p></div>
-        <div class="sec-header" style="margin-bottom:10px"><div class="sec-title">🎒 Class Members</div></div>
+        <div class="sec-header" style="margin-bottom:10px"><div class="sec-title">Class Members</div></div>
         <div id="manage-members"><p style="color:var(--muted);font-size:0.85rem">No members yet.</p></div>
       </div>
     </div>
@@ -547,17 +547,17 @@ a:hover { text-decoration: underline; }
         <button class="ed-back" onclick="navTo('home')">← Back</button>
         <input class="ed-title" id="ed-title" placeholder="Untitled" oninput="markUnsaved()">
         <div class="lang-tabs" id="lang-tabs">
-          <button class="lang-tab" data-lang="python" onclick="setLang('python')">🐍 Python</button>
-          <button class="lang-tab" data-lang="turtle" onclick="setLang('turtle')">🐢 Turtle</button>
-          <button class="lang-tab" data-lang="html"   onclick="setLang('html')">🌐 HTML</button>
-          <button class="lang-tab" data-lang="javascript" onclick="setLang('javascript')">⚡ JS</button>
+          <button class="lang-tab" data-lang="python" onclick="setLang('python')">Python</button>
+          <button class="lang-tab" data-lang="turtle" onclick="setLang('turtle')">Turtle</button>
+          <button class="lang-tab" data-lang="html"   onclick="setLang('html')">HTML</button>
+          <button class="lang-tab" data-lang="javascript" onclick="setLang('javascript')">JS</button>
         </div>
         <span class="syntax-badge syn-check" id="syn-badge">···</span>
         <div class="ed-spacer"></div>
         <span class="ed-status" id="ed-status"></span>
-        <button class="ed-save-btn" onclick="saveProject()">💾 Save</button>
-        <button class="ed-run-btn"  onclick="runCode()">▶ Run</button>
-        <button class="ed-share-btn" id="btn-share" onclick="openPermModal()">🔐 Share</button>
+        <button class="ed-save-btn" onclick="saveProject()">Save</button>
+        <button class="ed-run-btn"  onclick="runCode()">Run</button>
+        <button class="ed-share-btn" id="btn-share" onclick="openPermModal()">Share</button>
       </div>
       <div class="ed-workspace">
         <div class="ed-code-pane"><textarea id="code-ta"></textarea></div>
@@ -585,7 +585,7 @@ a:hover { text-decoration: underline; }
 <!-- ═══════ PROFILE DROPDOWN ═══════ -->
 <div id="profile-drop" class="hidden">
   <div class="dd-head"><div class="dd-head-name" id="dd-name">—</div><div class="dd-head-email" id="dd-email">—</div></div>
-  <div class="dd-item logout" onclick="doLogout()">🚪 Log Out</div>
+  <div class="dd-item logout" onclick="doLogout()">Log Out</div>
 </div>
 
 <!-- ═══════ MODAL: New Project ═══════ -->
@@ -596,10 +596,10 @@ a:hover { text-decoration: underline; }
     <div class="modal-field">
       <label>Language</label>
       <div class="lang-radio-grid" id="lang-radio-grid">
-        <div class="lang-radio-opt sel-py" data-val="python"     onclick="selectNewLang('python')">🐍 Python</div>
-        <div class="lang-radio-opt"        data-val="turtle"     onclick="selectNewLang('turtle')">🐢 Turtle</div>
-        <div class="lang-radio-opt"        data-val="html"       onclick="selectNewLang('html')">🌐 HTML</div>
-        <div class="lang-radio-opt"        data-val="javascript" onclick="selectNewLang('javascript')">⚡ JavaScript</div>
+        <div class="lang-radio-opt sel-py" data-val="python"     onclick="selectNewLang('python')">Python</div>
+        <div class="lang-radio-opt"        data-val="turtle"     onclick="selectNewLang('turtle')">Turtle</div>
+        <div class="lang-radio-opt"        data-val="html"       onclick="selectNewLang('html')">HTML</div>
+        <div class="lang-radio-opt"        data-val="javascript" onclick="selectNewLang('javascript')">JavaScript</div>
       </div>
     </div>
     <div class="err-msg" id="np-err"></div>
@@ -634,7 +634,7 @@ a:hover { text-decoration: underline; }
 <!-- ═══════ MODAL: Permissions ═══════ -->
 <div class="modal-bg hidden" id="modal-perm">
   <div class="modal-box" style="min-width:440px">
-    <h3>🔐 Share Project</h3>
+    <h3>Share Project</h3>
     <div class="info-box">Your User ID: <code id="my-uid" onclick="copyUID()">—</code> <small style="color:var(--muted)">(click to copy)</small></div>
     <div class="perm-add-row">
       <input type="text" id="perm-uid-input" placeholder="Paste a User ID">
@@ -666,13 +666,13 @@ a:hover { text-decoration: underline; }
 // ═══════════════════════════════════════════════════════════════════════
 const { Client, Account, Databases, ID, Query } = Appwrite;
 const client = new Client()
-  .setEndpoint('https://cloud.appwrite.io/v1') // ← your endpoint
-  .setProject('YOUR_PROJECT_ID');              // ← replace
+  .setEndpoint('https://nyc.cloud.appwrite.io/v1') // ← your endpoint
+  .setProject('6a80696d003219c6434c');              // ← replace
 
 const account = new Account(client);
 const db      = new Databases(client);
 
-const DB        = 'YOUR_DATABASE_ID';   // ← replace
+const DB        = '6a806ba9002944e1fff5';   // ← replace
 const C_PROF    = 'profiles';
 const C_CLASS   = 'classrooms';
 const C_JREQ    = 'join_requests';
@@ -830,7 +830,7 @@ async function loadClassroom() {
     permRes.documents.forEach(p => { myPerms[p.projectId] = p.permission; });
     const grid = document.getElementById('cl-grid');
     if (!projRes.documents.length) {
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="e-icon">📂</div><p>No projects shared yet.</p></div>`; return;
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No projects shared yet.</p></div>`; return;
     }
     grid.innerHTML = projRes.documents.map(p => projCard(p, myPerms, false)).join('');
   } catch(e) { console.error(e); }
@@ -845,8 +845,8 @@ function projCard(p, myPerms, ownView) {
   const chips   = { python:'py', turtle:'tu', html:'ht', javascript:'js' };
   const labels  = { python:'Python', turtle:'Turtle', html:'HTML', javascript:'JavaScript' };
   const c = chips[p.language] || 'py';
-  let acts = `<button class="act-btn play" onclick="playProj('${p.$id}')">▶ Play</button>`;
-  if (canCode) acts += `<button class="act-btn" onclick="openProj('${p.$id}')">${(isOwner||isT||perm==='edit')?'✏️ Edit':'👁 View'}</button>`;
+  let acts = `<button class="act-btn play" onclick="playProj('${p.$id}')">Play</button>`;
+  if (canCode) acts += `<button class="act-btn" onclick="openProj('${p.$id}')">${(isOwner||isT||perm==='edit')?'Edit':'View'}</button>`;
   if (isOwner || isT) acts += `<button class="act-btn del" onclick="delProj('${p.$id}')">🗑</button>`;
   return `<div class="proj-card lang-${c}">
     <div class="proj-card-lang-bar"></div>
@@ -1002,7 +1002,7 @@ async function delProj(id) {
 
 function markUnsaved() {
   S.unsaved = true;
-  document.getElementById('ed-status').textContent = '● Unsaved';
+  document.getElementById('ed-status').textContent = 'Unsaved';
 }
 
 // Ctrl+S to save
